@@ -33,8 +33,8 @@
     <!--    < to="/test">测试</>-->
     <!--    </p>-->
 
-    <a href="/test">测试</a>|
-    <a href="#/test">Home1</a> |
+    <!--    <a href="/test">测试</a>|-->
+    <!--    <a href="#/test">Home1</a> |-->
 
     <div>
       <input type="text" placeholder="请输入你想传输的内容" id="text" class="col-lg-12"/>
@@ -45,7 +45,10 @@
     </div>
 
     <div id="log">
-      <p>聊天记录:</p>
+      <p>沟通记录:</p>
+      <textarea id="chattingRecords" style="white-space: pre-wrap;width: 100%;height: 300px;" value="">
+
+      </textarea>
     </div>
   </div>
 </template>
@@ -93,7 +96,8 @@ export default {
   },
   data() {
     return {
-      currentPath: window.location.hash
+      currentPath: window.location.hash,
+      textareaValue: "test"
     }
   },
   computed: {
@@ -127,6 +131,14 @@ export default {
 
     websocket.onmessage = function (event) {
       console.log('收到消息' + event.data)
+      let text = document.querySelector('#chattingRecords');
+      if (text.value == '') {
+        text.value = event.data;
+      } else {
+        text.value = text.value + "\n" + event.data;
+      }
+      // this.textareaValue = this.textareaValue + "<br/>" + event.data;
+
     }
 
     websocket.onerror = function (event) {
@@ -152,9 +164,31 @@ export default {
         // log('客户端说：' + text.value);
 
         // 且下发控制设备命令
-        axios.get('http://localhost:8090/device/rpc').then(res => {
+        // axios.get('http://localhost:8090/device/rpc_get?controlValue=' + text.value).then(res => {
+        //   console.log("指令下发成功", res);
+        // })
+        axios.post('http://localhost:8090/device/rpc_post', {"controlValue": text.value}, {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }).then(res => {
           console.log("指令下发成功", res);
-        })
+        }).catch(error => {
+          if (error.response) {
+            // 请求已发出，但服务器响应的状态码不在2xx范围内
+            console.log(error.response.data);
+            console.log(error.response.status);
+            console.log(error.response.headers);
+          } else if (error.request) {
+            // 发出了请求，但没有收到响应
+            console.log(error.request);
+          } else {
+            // 在设置请求过程中发生了错误
+            console.log('Error', error.message);
+          }
+          console.log(error.config);
+        });
+
 
       } else {
         console.log('请先建立连接！')
