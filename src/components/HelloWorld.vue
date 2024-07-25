@@ -163,11 +163,34 @@ export default {
         console.log('客户端说：' + text.value)
         // log('客户端说：' + text.value);
 
-        // 且下发控制设备命令
+        // 下发控制设备命令-get方式
         // axios.get('http://localhost:8090/device/rpc_get?controlValue=' + text.value).then(res => {
         //   console.log("指令下发成功", res);
         // })
-        axios.post('http://localhost:8090/device/rpc_post', {"controlValue": text.value}, {
+        // 下发控制设备命令-post方式
+        // axios.post('http://localhost:8090/device/rpc_post', {"controlValue": text.value}, {
+        //   headers: {
+        //     'Content-Type': 'application/json'
+        //   }
+        // }).then(res => {
+        //   console.log("指令下发成功", res);
+        // }).catch(error => {
+        //   if (error.response) {
+        //     // 请求已发出，但服务器响应的状态码不在2xx范围内
+        //     console.log(error.response.data);
+        //     console.log(error.response.status);
+        //     console.log(error.response.headers);
+        //   } else if (error.request) {
+        //     // 发出了请求，但没有收到响应
+        //     console.log(error.request);
+        //   } else {
+        //     // 在设置请求过程中发生了错误
+        //     console.log('Error', error.message);
+        //   }
+        //   console.log(error.config);
+        // });
+        // 下发控制设备命令-post方式+本地ems
+        axios.post('http://localhost:8090/device/rpc_post_ems', {"controlValue": text.value}, {
           headers: {
             'Content-Type': 'application/json'
           }
