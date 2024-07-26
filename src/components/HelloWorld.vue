@@ -42,12 +42,18 @@
       <input type="button" value="发送" class="btn btn-success" id="sent" @click="sent"/>
       <!--    <input type="button" value="断开" class="btn btn-danger" id="disconnect" disabled="disabled"-->
       <!--           onclick="disconnect()"/>-->
+      <div>
+        <!--    <input type="button" value="连接" class="btn btn-info" id="connect" onclick="connect()"/>-->
+        <input type="button" value="获得用户" class="btn btn-success" id="getUser" @click="getUser"/>
+        <input type="button" value="获得所有用户" class="btn btn-success" id="getUser" @click="getAllUser"/>
+        <!--    <input type="button" value="断开" class="btn btn-danger" id="disconnect" disabled="disabled"-->
+        <!--           onclick="disconnect()"/>-->
+      </div>
     </div>
 
     <div id="log">
       <p>沟通记录:</p>
       <textarea id="chattingRecords" style="white-space: pre-wrap;width: 100%;height: 300px;" value="">
-
       </textarea>
     </div>
   </div>
@@ -130,12 +136,12 @@ export default {
     }
 
     websocket.onmessage = function (event) {
-      console.log('收到消息' + event.data)
+      console.log('收到设备消息' + event.data)
       let text = document.querySelector('#chattingRecords');
-      if (text.value == '') {
-        text.value = event.data;
+      if (text.value === '') {
+        text.value = '收到设备消息：' + event.data;
       } else {
-        text.value = text.value + "\n" + event.data;
+        text.value = text.value + "\n" + '收到设备消息：' + event.data;
       }
       // this.textareaValue = this.textareaValue + "<br/>" + event.data;
 
@@ -196,6 +202,12 @@ export default {
           }
         }).then(res => {
           console.log("指令下发成功", res);
+          let text = document.querySelector('#chattingRecords');
+          if (text.value === '') {
+            text.value = 'rpc控制状态：' + res.status;
+          } else {
+            text.value = text.value + "\n" + 'rpc控制状态：' + res.status;
+          }
         }).catch(error => {
           if (error.response) {
             // 请求已发出，但服务器响应的状态码不在2xx范围内
@@ -217,6 +229,28 @@ export default {
         console.log('请先建立连接！')
         // log('请先建立连接！')
       }
+    },
+    getUser() {
+      axios.get('http://localhost:8090/user/getUser?id=1').then(res => {
+        console.log("查询用户", res);
+        let text = document.querySelector('#chattingRecords');
+        if (text.value === '') {
+          text.value = '获得用户信息：' + JSON.stringify(res.data);
+        } else {
+          text.value = text.value + "\n" + '获得用户信息：' + JSON.stringify(res.data);
+        }
+      })
+    },
+    getAllUser() {
+      axios.get('http://localhost:8090/user/getUser').then(res => {
+        console.log("查询所有用户", res);
+        let text = document.querySelector('#chattingRecords');
+        if (text.value === '') {
+          text.value = '获得用户信息：' + JSON.stringify(res.data);
+        } else {
+          text.value = text.value + "\n" + '获得用户信息：' + JSON.stringify(res.data);
+        }
+      })
     }
 
   }
